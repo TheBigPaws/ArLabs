@@ -26,7 +26,7 @@ ACustomGameMode::ACustomGameMode():
 
 void ACustomGameMode::StartPlay() 
 {
-	SpawnInitialActors();
+	//SpawnInitialActors();
 
 	// This is called before BeginPlay
 	StartPlayEvent();
@@ -46,7 +46,7 @@ void ACustomGameMode::StartPlay()
 void ACustomGameMode::StartPlayEvent_Implementation() 
 {
 	// Start a timer which will call the SpawnCube Function every 4 seconds
-	GetWorldTimerManager().SetTimer(Ticker, this, &ACustomGameMode::SpawnCube, 4.0f, true, 0.0f);
+	//GetWorldTimerManager().SetTimer(Ticker, this, &ACustomGameMode::SpawnCube, 4.0f, true, 0.0f);
 }
 
 int32 ACustomGameMode::GetScore()
@@ -76,8 +76,7 @@ void ACustomGameMode::Tick(float DeltaSeconds)
 
 void ACustomGameMode::SpawnInitialActors()
 {
-	SpawnCube();
-	// Spawn an instance of the HelloARManager class
+	//SpawnCube();
 
 }
 

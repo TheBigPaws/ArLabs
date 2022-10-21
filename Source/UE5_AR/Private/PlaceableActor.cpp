@@ -18,7 +18,7 @@ APlaceableActor::APlaceableActor()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(SceneComponent);
 
-	auto MeshAsset = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
+	auto MeshAsset = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Game/Assets/Meshes/Andy_Mesh.Andy_Mesh'"));
 	StaticMeshComponent->SetStaticMesh(MeshAsset.Object);
 	
 

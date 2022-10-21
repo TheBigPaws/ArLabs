@@ -27,8 +27,8 @@ ACustomARPawn::ACustomARPawn()
 void ACustomARPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	UARSessionConfig* Config = NewObject<UARSessionConfig>();
-	UARBlueprintLibrary::StartARSession(Config);
+	//UARSessionConfig* Config = NewObject<UARSessionConfig>();
+	//UARBlueprintLibrary::StartARSession(Config);
 }
 
 
@@ -59,7 +59,7 @@ void ACustomARPawn::OnScreenTouch(const ETouchIndex::Type FingerIndex, const FVe
 	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("ScreenTouch Reached"));
 	if(GM)
 	{
-		// Add call to the line-trace here from the Custom Game Mode
+		GM->LineTraceSpawnActor(ScreenPos);
 	}
 	// Perform a hitTest, get the return values as hitTesTResult
 	FHitResult HRRef;
@@ -76,6 +76,9 @@ void ACustomARPawn::OnScreenTouch(const ETouchIndex::Type FingerIndex, const FVe
 	{
 		UKismetSystemLibrary::PrintString(this, "Cube clicked!", true, true, FLinearColor(0, 0.66, 1, 1), 2);
 	}
+
+
+	
 }
 
 bool ACustomARPawn::WorldHitTest(FVector2D screenTouchPos, FHitResult hitResult) {
