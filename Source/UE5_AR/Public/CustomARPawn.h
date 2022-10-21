@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-
+//#include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/Pawn.h"
 #include "CustomARPawn.generated.h"
 
@@ -29,10 +30,13 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	//virtual void OnScreenTouch(const ETouchIndex::Type fingerIndex, const FVector screenPos);
+
 	UPROPERTY(Category = "myCategory", VisibleAnywhere, BlueprintReadWrite)
 		USceneComponent* SceneComponent;
 
 	UPROPERTY(Category = "myCategory", VisibleAnywhere, BlueprintReadWrite)
 		UCameraComponent* CameraComponent;
 
+	bool WorldHitTest(FVector2D screenTouchPos, FHitResult hitResult);
 };

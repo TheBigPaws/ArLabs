@@ -32,6 +32,10 @@ void ACustomGameMode::StartPlay()
 	StartPlayEvent();
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Current Score: %d"), GetScore()));
 
+	//UARSessionConfig* Config = NewObject<UARSessionConfig>();
+	AHelloARManager* Manager = GetWorld()->SpawnActor<AHelloARManager>();
+	//UARBlueprintLibrary::StartARSession(Config);
+	
 	// This function will transcend to call BeginPlay on all the actors 
 	Super::StartPlay();
 	
@@ -72,7 +76,7 @@ void ACustomGameMode::Tick(float DeltaSeconds)
 
 void ACustomGameMode::SpawnInitialActors()
 {
-
+	SpawnCube();
 	// Spawn an instance of the HelloARManager class
 
 }
