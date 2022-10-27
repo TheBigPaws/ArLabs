@@ -72,6 +72,10 @@ void ACustomGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("ScreenTouch Reached"));
+
+
 }
 
 void ACustomGameMode::SpawnInitialActors()

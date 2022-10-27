@@ -4,6 +4,7 @@
 #include "PlaceableActor.h"
 #include "ARPin.h"
 #include "ARBlueprintLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APlaceableActor::APlaceableActor()
@@ -21,6 +22,18 @@ APlaceableActor::APlaceableActor()
 	auto MeshAsset = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Game/Assets/Meshes/Andy_Mesh.Andy_Mesh'"));
 	StaticMeshComponent->SetStaticMesh(MeshAsset.Object);
 	
+	onMat = CreateDefaultSubobject<UMaterialInstanceDynamic>(TEXT("OnMaterial"));
+	offMat = CreateDefaultSubobject<UMaterialInstanceDynamic>(TEXT("OffMaterial"));
+
+
+	
+	static ConstructorHelpers::FObjectFinder<UMaterial> Material_(TEXT("Material'/Game/Assets/Materials/greenMat.greenMat'"));
+	UMaterial* settingMaterial_ = (UMaterial*)Material_.Object;
+	onMat = UMaterialInstanceDynamic::Create(settingMaterial_, NULL);
+
+	static ConstructorHelpers::FObjectFinder<UMaterial> Material(TEXT("Material'/Game/Assets/Materials/redMat.redMat'"));
+	UMaterial* settingMaterial = (UMaterial*)Material.Object;
+	offMat = UMaterialInstanceDynamic::Create(settingMaterial, NULL);
 
 }
 
@@ -28,7 +41,12 @@ APlaceableActor::APlaceableActor()
 void APlaceableActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	for (TObjectIterator<ACustomARPawn> It; It; ++It)
+	{
+		pawnRef = *It;
+	}
+
 }
 
 // Called every frame
@@ -36,6 +54,26 @@ void APlaceableActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
+	
+	APlayerCameraManager* manRef = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
+
+	FVector distanceToPawn = this->GetActorLocation() - manRef->GetActorTransform().GetLocation();
+
+	
+	if (distanceToPawn.Length() < 100 && nearby == false) {
+			StaticMeshComponent->SetMaterial(0, onMat);
+	
+			nearby = true;
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("came near!"));
+	}else if (distanceToPawn.Length() > 100 && nearby == true) {
+			StaticMeshComponent->SetMaterial(0, offMat);
+	
+			nearby = false;
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("is far now!"));
+	}
+
+
+
 	// Making sure the actor remains on the ARPin that has been found.
 	if(PinComponent)
 	{

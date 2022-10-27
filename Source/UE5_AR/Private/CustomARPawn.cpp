@@ -36,6 +36,19 @@ void ACustomARPawn::BeginPlay()
 void ACustomARPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	FString arPawnPos = "ARPAWN POS: ";
+	FString CameraPos = "Camera POS: ";
+
+
+	APlayerCameraManager* manRef = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
+
+	CameraPos += manRef->GetActorTransform().GetLocation().ToString();
+
+
+
+	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Blue, arPawnPos);
+	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Green, CameraPos);
 }
 
 // Called to bind functionality to input
@@ -56,7 +69,8 @@ void ACustomARPawn::OnScreenTouch(const ETouchIndex::Type FingerIndex, const FVe
 	auto Temp = GetWorld()->GetAuthGameMode();
 	auto GM = Cast<ACustomGameMode>(Temp);
 
-	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("ScreenTouch Reached"));
+	
+
 	if(GM)
 	{
 		GM->LineTraceSpawnActor(ScreenPos);
