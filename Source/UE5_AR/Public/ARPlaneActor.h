@@ -66,4 +66,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GoogleARCorePlaneActor")
 		void SetColor(FColor InColor);
 
+	bool shouldBeVisible = true;
+
 };

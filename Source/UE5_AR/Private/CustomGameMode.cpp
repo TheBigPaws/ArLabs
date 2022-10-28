@@ -87,7 +87,7 @@ void ACustomGameMode::SpawnInitialActors()
 
 void ACustomGameMode::LineTraceSpawnActor(FVector ScreenPos)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("Line Trace Reached"));
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("Line Trace Reached"));
 
 	//Basic variables for functionality
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
@@ -113,22 +113,31 @@ void ACustomGameMode::LineTraceSpawnActor(FVector ScreenPos)
 			// Check if ARPins are available on your current device. ARPins are currently not supported locally by ARKit, so on iOS, this will always be "FALSE" 
 			if (ActorPin)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::White, TEXT("ARPin is valid"));
+				//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::White, TEXT("ARPin is valid"));
 				//If the pin is valid 
 				auto PinTF = ActorPin->GetLocalToWorldTransform();
 				//Spawn a new Actor at the location if not done yet
-				if (!SpawnedActor)
-				{
-					const FActorSpawnParameters SpawnInfo;
-					const FRotator MyRot(0, 0, 0);
-					const FVector MyLoc(0, 0, 0);
-					SpawnedActor = GetWorld()->SpawnActor<APlaceableActor>(MyLoc, MyRot, SpawnInfo);
-				}
 
+				//CODE THAT RESETS POS oF > 1 < PA
+				//if (!SpawnedActor)
+				//{
+				//	const FActorSpawnParameters SpawnInfo;
+				//	const FRotator MyRot(0, 0, 0);
+				//	const FVector MyLoc(0, 0, 0);
+				//	SpawnedActor = GetWorld()->SpawnActor<APlaceableActor>(MyLoc, MyRot, SpawnInfo);
+				//}
+				//
+				//
+				//// Set the spawned actor location based on the Pin. Have a look at the code for Placeable Object to see how it handles the AR PIN passed on
+				//SpawnedActor->SetActorTransform(PinTF);
+				//SpawnedActor->PinComponent = ActorPin;
 
-				// Set the spawned actor location based on the Pin. Have a look at the code for Placeable Object to see how it handles the AR PIN passed on
-				SpawnedActor->SetActorTransform(PinTF);
-				SpawnedActor->PinComponent = ActorPin;
+				const FActorSpawnParameters SpawnInfo;
+				const FRotator MyRot(0, 0, 0);
+				const FVector MyLoc(0, 0, 0);
+				APlaceableActor * actrRef_ = GetWorld()->SpawnActor<APlaceableActor>(MyLoc, MyRot, SpawnInfo);
+				actrRef_->SetActorTransform(PinTF);
+				actrRef_->PinComponent = ActorPin;
 			
 			}
 			// IF ARPins are Not supported locally (for iOS Devices) We will spawn the object in the location where the line trace has hit

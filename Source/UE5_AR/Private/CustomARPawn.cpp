@@ -8,6 +8,9 @@
 #include "CustomActor.h"
 #include "Camera/CameraComponent.h"
 #include "CustomGameMode.h"
+#include "ARPlaneActor.h"
+
+#
 
 // Sets default values
 ACustomARPawn::ACustomARPawn()
@@ -37,18 +40,12 @@ void ACustomARPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FString arPawnPos = "ARPAWN POS: ";
-	FString CameraPos = "Camera POS: ";
+	//SHOW CAM POS
+	//FString CameraPos = "Camera POS: ";
+	//APlayerCameraManager* manRef = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
+	//CameraPos += manRef->GetActorTransform().GetLocation().ToString();
+	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Green, CameraPos);
 
-
-	APlayerCameraManager* manRef = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
-
-	CameraPos += manRef->GetActorTransform().GetLocation().ToString();
-
-
-
-	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Blue, arPawnPos);
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Green, CameraPos);
 }
 
 // Called to bind functionality to input
@@ -60,8 +57,18 @@ void ACustomARPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//Bind various player inputs to functions
 	// There are a few types - BindTouch, BindAxis, and BindEvent.  
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &ACustomARPawn::OnScreenTouch);
+	PlayerInputComponent->BindTouch(IE_Repeat, this, &ACustomARPawn::OnScreenHeld);
 
-	//layerInputComponent->BindTouch(IE_Pressed, this, &ACustomARPawn::OnScreenTouch);
+}
+
+void ACustomARPawn::OnScreenHeld(const ETouchIndex::Type FingerIndex, const FVector ScreenPos) {
+	if (selectedActor_) {
+		auto TraceResult = UARBlueprintLibrary::LineTraceTrackedObjects(FVector2D(ScreenPos), false, false, false, true);
+		auto TrackedTF = TraceResult[0].GetLocalToWorldTransform();
+
+		selectedActor_->myPos = TrackedTF.GetLocation();
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Orange, TrackedTF.GetLocation().ToString());
+	}
 }
 
 void ACustomARPawn::OnScreenTouch(const ETouchIndex::Type FingerIndex, const FVector ScreenPos)
@@ -69,33 +76,84 @@ void ACustomARPawn::OnScreenTouch(const ETouchIndex::Type FingerIndex, const FVe
 	auto Temp = GetWorld()->GetAuthGameMode();
 	auto GM = Cast<ACustomGameMode>(Temp);
 
-	
-
-	if(GM)
+	//deselect all on new touch
+	for (TObjectIterator<APlaceableActor> It; It; ++It)
 	{
-		GM->LineTraceSpawnActor(ScreenPos);
+		APlaceableActor* CurrentObject = *It;
+		CurrentObject->selected = false;
+		CurrentObject->nearby = true;
+		CurrentObject->StaticMeshComponent->SetMaterial(0, CurrentObject->onMat);
+		CurrentObject->SetActorScale3D(FVector(1.0f, 1.0f, 1.0f));
+		selectedActor_ = NULL;
 	}
+
+	
 	// Perform a hitTest, get the return values as hitTesTResult
 	FHitResult HRRef;
 	if (!WorldHitTest(FVector2D(ScreenPos), HRRef))
 	{
 		// HitTest returned false, get out.
-		UKismetSystemLibrary::PrintString(this, "Nothing pressed", true, true, FLinearColor(0, 0.66, 1, 1), 2);
-		return;
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Orange, TEXT("Nothing pressed"));
+		//return;
+
+		for (TObjectIterator<AARPlaneActor> It; It; ++It)
+		{
+			AARPlaneActor* CurrentObject = *It;
+			CurrentObject->shouldBeVisible = true;
+		}
 	}
-	// Get object of actor hit.
-	UClass* hitActorClass = UGameplayStatics::GetObjectClass(HRRef.GetActor());
-	// if we've hit a target.
-	if (UKismetMathLibrary::ClassIsChildOf(hitActorClass, ACustomActor::StaticClass()))
-	{
-		UKismetSystemLibrary::PrintString(this, "Cube clicked!", true, true, FLinearColor(0, 0.66, 1, 1), 2);
+	else {
+		//UClass* hitActorClass = UGameplayStatics::GetObjectClass(HRRef.GetActor());
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, hitActorClass->GetFName().ToString());
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, HRRef.GetActor()->GetClass()->GetFName().ToString());
+		//return;
+			APlaceableActor* placActorRef = Cast<APlaceableActor>(HRRef.GetActor());
+			if (placActorRef) {
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("Android clicked"));
+				placActorRef->selected = true;
+				placActorRef->StaticMeshComponent->SetMaterial(0, placActorRef->selectedMat);
+				selectedActor_ = placActorRef;
+
+				for (TObjectIterator<AARPlaneActor> It; It; ++It)
+				{
+					AARPlaneActor* CurrentObject = *It;
+					CurrentObject->shouldBeVisible = false;
+				}
+				return;
+			}
+			else {
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("CAST TO PlaceableActor FAILED"));
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, HRRef.GetActor()->GetFName().ToString());
+				for (TObjectIterator<AARPlaneActor> It; It; ++It)
+				{
+					AARPlaneActor* CurrentObject = *It;
+					CurrentObject->shouldBeVisible = true;
+				}
+				return;
+			}
+		
 	}
 
+	// Get object of actor hit.
+	//UClass* hitActorClass = UGameplayStatics::GetObjectClass(HRRef.GetActor());
+	// if we've hit a target.
+
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString(HRRef.GetActor()->GetClass()));
+	//UKismetSystemLibrary::PrintString(this, HRRef.GetActor()->GetClass().tostr, true, true, FLinearColor(0, 0.66, 1, 1), 2);
+
+
+	//APlaceableActor* placActorRef = Cast<APlaceableActor>(HRRef.GetActor());
+
+	
+	if (GM)
+	{
+		GM->LineTraceSpawnActor(ScreenPos);
+	}
 
 	
 }
 
-bool ACustomARPawn::WorldHitTest(FVector2D screenTouchPos, FHitResult hitResult) {
+bool ACustomARPawn::WorldHitTest(FVector2D screenTouchPos, FHitResult & hitResult) {
 	// Get player controller
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
 	// Perform deprojection taking 2d clicked area and generating reference in 3d world-space.
@@ -112,9 +170,9 @@ bool ACustomARPawn::WorldHitTest(FVector2D screenTouchPos, FHitResult hitResult)
 	bool traceSuccess = GetWorld()->LineTraceSingleByChannel(hitResult, worldPosition, traceEndVector, ECollisionChannel::ECC_WorldDynamic);
 
 	if (traceSuccess) {
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("HIT SUCCESS"));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("HIT SUCCESS"));
 	}else{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("NO HIT"));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("NO HIT"));
 	}
 	// return if the operation was successful
 	return traceSuccess;

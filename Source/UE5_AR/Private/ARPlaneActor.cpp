@@ -59,12 +59,16 @@ void AARPlaneActor::Tick(float DeltaTime)
 		PlanePolygonMeshComponent->SetVisibility(false);
 		break;
 	}
+
+	PlanePolygonMeshComponent->SetVisibility(shouldBeVisible);
 }
 
 void AARPlaneActor::SetColor(FColor InColor) {
 	PlaneColor = InColor;
 	PlaneMaterial->SetVectorParameterValue("PlaneTint", InColor);
 }
+
+
 
 void AARPlaneActor::UpdatePlanePolygonMesh()
 {

@@ -24,6 +24,7 @@ APlaceableActor::APlaceableActor()
 	
 	onMat = CreateDefaultSubobject<UMaterialInstanceDynamic>(TEXT("OnMaterial"));
 	offMat = CreateDefaultSubobject<UMaterialInstanceDynamic>(TEXT("OffMaterial"));
+	selectedMat = CreateDefaultSubobject<UMaterialInstanceDynamic>(TEXT("SelectedMat"));
 
 
 	
@@ -35,6 +36,11 @@ APlaceableActor::APlaceableActor()
 	UMaterial* settingMaterial = (UMaterial*)Material.Object;
 	offMat = UMaterialInstanceDynamic::Create(settingMaterial, NULL);
 
+	static ConstructorHelpers::FObjectFinder<UMaterial> Material_s(TEXT("Material'/Game/Assets/Materials/yellowMat.yellowMat'"));
+	UMaterial* settingMaterial_s = (UMaterial*)Material_s.Object;
+	selectedMat = UMaterialInstanceDynamic::Create(settingMaterial_s, NULL);
+
+	myScale = FVector(1.0f, 1.0f, 1.0f);
 }
 
 // Called when the game starts or when spawned
@@ -42,10 +48,10 @@ void APlaceableActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (TObjectIterator<ACustomARPawn> It; It; ++It)
-	{
-		pawnRef = *It;
-	}
+	//for (TObjectIterator<ACustomARPawn> It; It; ++It)
+	//{
+	//	pawnRef = *It;
+	//}
 
 }
 
@@ -54,24 +60,26 @@ void APlaceableActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	
-	APlayerCameraManager* manRef = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
+	bool debugProximity = false;
+	if (debugProximity) {
+		//distance code
+		APlayerCameraManager* manRef = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
+		FVector distanceToPawn = this->GetActorLocation() - manRef->GetActorTransform().GetLocation();
 
-	FVector distanceToPawn = this->GetActorLocation() - manRef->GetActorTransform().GetLocation();
-
-	
-	if (distanceToPawn.Length() < 100 && nearby == false) {
+		if (distanceToPawn.Length() < 100 && nearby == false) {
 			StaticMeshComponent->SetMaterial(0, onMat);
-	
-			nearby = true;
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("came near!"));
-	}else if (distanceToPawn.Length() > 100 && nearby == true) {
-			StaticMeshComponent->SetMaterial(0, offMat);
-	
-			nearby = false;
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("is far now!"));
-	}
 
+			nearby = true;
+			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("came near!"));
+		}
+		else if (distanceToPawn.Length() > 100 && nearby == true) {
+			StaticMeshComponent->SetMaterial(0, offMat);
+
+			nearby = false;
+			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("is far now!"));
+		}
+
+	}
 
 
 	// Making sure the actor remains on the ARPin that has been found.
@@ -86,7 +94,7 @@ void APlaceableActor::Tick(float DeltaTime)
 			SetActorTransform(PinComponent->GetLocalToWorldTransform());
 
 			// Scale down default cube mesh - Change this for your applications.
-			SetActorScale3D(FVector(0.2f, 0.2f, 0.2f));
+			//SetActorScale3D(FVector(0.2f, 0.2f, 0.2f));
 			break;
 
 		case EARTrackingState::NotTracking:
@@ -97,6 +105,25 @@ void APlaceableActor::Tick(float DeltaTime)
 		}
 	}
 	
+	if (selected) {
+		float x_scale = myScale.X;
+
+
+
+		if (x_scale > 1.4f && expander > 0) {
+			expander *= -1.0f;
+		}
+		if (x_scale < 0.9f && expander < 0) {
+			expander *= -1.0f;
+		}
+
+		float dtScale = expander * DeltaTime;
+		myScale += FVector(dtScale, dtScale, dtScale);
+		SetActorScale3D(myScale);
+		myPos.Z = PinComponent->GetLocalToWorldTransform().GetLocation().Z;
+		SetActorLocation(myPos);
+
+	}
 
 }
 

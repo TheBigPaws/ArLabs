@@ -3,7 +3,7 @@
 #pragma once
 
 
-#include "CustomARPawn.h"
+//#include "CustomARPawn.h"
 #include "GameFramework/Actor.h"
 #include "PlaceableActor.generated.h"
 
@@ -25,7 +25,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	ACustomARPawn * pawnRef;
+	//ACustomARPawn * pawnRef;
 
 	UPROPERTY(Category = "myCategory", VisibleAnywhere, BlueprintReadWrite)
 		USceneComponent* SceneComponent;
@@ -36,15 +36,14 @@ public:
 	UARPin* PinComponent;
 
 	bool nearby = false;
-
-	//UPROPERTY(EditAnywhere)
-	//	class UMaterial* OnMaterial;
-	//
-	//UPROPERTY(EditAnywhere)
-	//	class UMaterial* OffMaterial;
+	bool selected = false;
 
 	UMaterialInstanceDynamic* onMat;
 	UMaterialInstanceDynamic* offMat;
+	UMaterialInstanceDynamic* selectedMat;
 
+	FVector myScale;
+	FVector myPos;
 
+	float expander = 10.0f;
 };

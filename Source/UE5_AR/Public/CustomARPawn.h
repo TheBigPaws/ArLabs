@@ -3,6 +3,7 @@
 #pragma once
 //#include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "PlaceableActor.h"
 #include "GameFramework/Pawn.h"
 #include "CustomARPawn.generated.h"
 
@@ -22,6 +23,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void OnScreenTouch(const ETouchIndex::Type FingerIndex, const FVector ScreenPos);
+	virtual void OnScreenHeld(const ETouchIndex::Type FingerIndex, const FVector ScreenPos);
 
 public:	
 	// Called every frame
@@ -38,5 +40,7 @@ public:
 	UPROPERTY(Category = "myCategory", VisibleAnywhere, BlueprintReadWrite)
 		UCameraComponent* CameraComponent;
 
-	bool WorldHitTest(FVector2D screenTouchPos, FHitResult hitResult);
+	bool WorldHitTest(FVector2D screenTouchPos, FHitResult & hitResult);
+
+	APlaceableActor* selectedActor_;
 };
