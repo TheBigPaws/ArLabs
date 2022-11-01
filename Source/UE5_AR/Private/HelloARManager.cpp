@@ -6,7 +6,7 @@
 #include "ARPin.h"
 #include "ARSessionConfig.h"
 #include "ARBlueprintLibrary.h"
-#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AHelloARManager::AHelloARManager()
@@ -21,6 +21,7 @@ AHelloARManager::AHelloARManager()
 	// This way, unreal will notify your artist if the asset is being used and what can be used to replace it.
 	static ConstructorHelpers::FObjectFinder<UARSessionConfig> ConfigAsset(TEXT("ARSessionConfig'/Game/Blueprints/HelloARSessionConfig.HelloARSessionConfig'"));
 	Config = ConfigAsset.Object;
+	//UARBlueprintLibrary::StartARSession(Config);
 
 
 	//Populate the plane colours array

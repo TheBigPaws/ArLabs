@@ -5,6 +5,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "PlaceableActor.h"
 #include "GameFramework/Pawn.h"
+#include "ARSessionConfig.h"
+#include "ARBlueprintLibrary.h"
 #include "CustomARPawn.generated.h"
 
 class UCameraComponent;
@@ -25,6 +27,8 @@ protected:
 	virtual void OnScreenTouch(const ETouchIndex::Type FingerIndex, const FVector ScreenPos);
 	virtual void OnScreenHeld(const ETouchIndex::Type FingerIndex, const FVector ScreenPos);
 
+	UARSessionConfig* Config;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -42,5 +46,13 @@ public:
 
 	bool WorldHitTest(FVector2D screenTouchPos, FHitResult & hitResult);
 
+	void handleImageRecognition();
+
 	APlaceableActor* selectedActor_;
+
+	bool bGoghFound = false;
+	bool bWorldFound = false;
+	AActor* GoghCube;
+	AActor* WorldCube;
+
 };

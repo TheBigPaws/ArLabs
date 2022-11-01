@@ -43,7 +43,7 @@ protected:
 	FColor GetPlaneColor(int Index);
 	void ResetARCoreSession();
 	// Configuration file for AR Session
-	UARSessionConfig* Config;
+	UARSessionConfig * Config;
 
 	//Base plane actor for geometry detection
 	AARPlaneActor* PlaneActor;

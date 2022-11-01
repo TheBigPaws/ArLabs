@@ -2,15 +2,15 @@
 
 
 #include "CustomARPawn.h"
-#include "Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h"
-#include "ARBlueprintLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "CustomActor.h"
 #include "Camera/CameraComponent.h"
 #include "CustomGameMode.h"
+#include "goghCube.h"
+#include "WorldSphere.h"
 #include "ARPlaneActor.h"
 
-#
 
 // Sets default values
 ACustomARPawn::ACustomARPawn()
@@ -24,14 +24,20 @@ ACustomARPawn::ACustomARPawn()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	
 	CameraComponent->SetupAttachment(SceneComponent);
+
+
+	static ConstructorHelpers::FObjectFinder<UARSessionConfig> ConfigAsset(TEXT("ARSessionConfig'/Game/Blueprints/HelloARSessionConfig.HelloARSessionConfig'"));
+	Config = ConfigAsset.Object;
+
 }
 
 // Called when the game starts or when spawned
 void ACustomARPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	//UARSessionConfig* Config = NewObject<UARSessionConfig>();
-	//UARBlueprintLibrary::StartARSession(Config);
+
+	UARBlueprintLibrary::StartARSession(Config);
+
 }
 
 
@@ -39,6 +45,8 @@ void ACustomARPawn::BeginPlay()
 void ACustomARPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	handleImageRecognition();
 
 	//SHOW CAM POS
 	//FString CameraPos = "Camera POS: ";
@@ -64,10 +72,15 @@ void ACustomARPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 void ACustomARPawn::OnScreenHeld(const ETouchIndex::Type FingerIndex, const FVector ScreenPos) {
 	if (selectedActor_) {
 		auto TraceResult = UARBlueprintLibrary::LineTraceTrackedObjects(FVector2D(ScreenPos), false, false, false, true);
-		auto TrackedTF = TraceResult[0].GetLocalToWorldTransform();
+		if (TraceResult.Num() > 0) {
+			auto TrackedTF = TraceResult[0].GetLocalToWorldTransform();
 
-		selectedActor_->myPos = TrackedTF.GetLocation();
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Orange, TrackedTF.GetLocation().ToString());
+			selectedActor_->myPos = TrackedTF.GetLocation();
+			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Orange, TrackedTF.GetLocation().ToString());
+		}
+		else {
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Drag function is linetracing outside the plane");
+		}
 	}
 }
 
@@ -176,4 +189,48 @@ bool ACustomARPawn::WorldHitTest(FVector2D screenTouchPos, FHitResult & hitResul
 	}
 	// return if the operation was successful
 	return traceSuccess;
+}
+
+void ACustomARPawn::handleImageRecognition() {
+	auto storage = UARBlueprintLibrary::GetAllGeometriesByClass<UARTrackedImage>();
+
+	for (int i = 0; i < storage.Num(); i++) {
+		if (storage[i]->GetDetectedImage()) {
+			if (storage[i]->GetDetectedImage()->GetFriendlyName().Equals("vgoghDA")) {
+				auto Tf = storage[i]->GetLocalToTrackingTransform();
+				FVector MyLoc(0, 0, 0);
+				MyLoc = Tf.GetLocation();
+
+				if (!bGoghFound) {
+					const FActorSpawnParameters SpawnInfo;
+					const FRotator MyRot(0, 0, 0);
+					GoghCube = GetWorld()->SpawnActor<AgoghCube>(MyLoc, MyRot, SpawnInfo);
+					GoghCube->SetActorScale3D(FVector(0.1f, 0.1f, 0.1f));
+					bGoghFound = true;
+					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("Goggy found and spawned cube!"));
+
+				}
+
+				GoghCube->SetActorLocation(MyLoc);
+
+			}
+			else if(storage[i]->GetDetectedImage()->GetFriendlyName().Equals("earthDA")) {
+				auto Tf = storage[i]->GetLocalToTrackingTransform();
+				FVector MyLoc(0, 0, 0);
+				MyLoc = Tf.GetLocation();
+
+				if (!bWorldFound) {
+					const FActorSpawnParameters SpawnInfo;
+					const FRotator MyRot(0, 0, 0);
+					WorldCube = GetWorld()->SpawnActor<AWorldSphere>(MyLoc, MyRot, SpawnInfo);
+					WorldCube->SetActorScale3D(FVector(0.1f, 0.1f, 0.1f));
+					bWorldFound = true;
+					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("Goggy found and spawned cube!"));
+
+				}
+
+				WorldCube->SetActorLocation(MyLoc);
+			}
+		}
+	}
 }
