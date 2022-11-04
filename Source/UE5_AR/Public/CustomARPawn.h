@@ -29,7 +29,7 @@ protected:
 
 	UARSessionConfig* Config;
 
-	float desktopMSspeed = 100.0f;
+	float desktopMSspeed = 60.0f;
 
 public:	
 	// Called every frame
@@ -58,6 +58,8 @@ public:
 	AActor* WorldCube;
 
 	void moveRight(float amount);
+	void moveUp(float amount);
 	void moveForward(float amount);
-
+	void LookRight(float amount);
+	void LookUp(float amount);
 };

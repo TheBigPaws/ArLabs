@@ -10,7 +10,7 @@
 #include "goghCube.h"
 #include "WorldSphere.h"
 #include "ARPlaneActor.h"
-
+#include <string>
 
 // Sets default values
 ACustomARPawn::ACustomARPawn()
@@ -69,7 +69,10 @@ void ACustomARPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//this->GetMovementComponent()
 	PlayerInputComponent->BindTouch(IE_Repeat, this, &ACustomARPawn::OnScreenHeld);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACustomARPawn::moveRight);
+	PlayerInputComponent->BindAxis("MoveUp", this, &ACustomARPawn::moveUp);
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACustomARPawn::moveForward);
+	PlayerInputComponent->BindAxis("LookRight", this, &ACustomARPawn::LookRight);
+	PlayerInputComponent->BindAxis("LookUp", this, &ACustomARPawn::LookUp);
 
 }
 
@@ -232,13 +235,47 @@ void ACustomARPawn::handleImageRecognition() {
 void ACustomARPawn::moveRight(float amount) {
 	if (amount) {
 		FVector fwd = GetActorRightVector();
-		this->AddActorWorldOffset(fwd * desktopMSspeed);
+		this->AddActorWorldOffset(fwd * desktopMSspeed * amount);
 	}
 }
 void ACustomARPawn::moveForward(float amount) {
 	if (amount){
 		FVector fwd = GetActorForwardVector();
-		this->AddActorWorldOffset(fwd * desktopMSspeed);
+		this->AddActorWorldOffset(fwd * desktopMSspeed * amount);
 
 	}
+}
+
+void ACustomARPawn::moveUp(float amount) {
+	if (amount) {
+		FVector fwd = GetActorUpVector();
+		this->AddActorWorldOffset(fwd * desktopMSspeed * amount);
+
+	}
+}
+
+void ACustomARPawn::LookRight(float amount) {
+	
+	//std::string inStr = std::to_string(amount);
+	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Green, inStr.c_str());
+	//FRotator rot = FRotator(0, amount, 0);
+	//this->AddActorLocalRotation(rot);
+
+
+	FRotator rot = this->GetActorRotation() + FRotator(0, amount, 0);
+
+
+	this->SetActorRotation(rot);
+
+}
+void ACustomARPawn::LookUp(float amount) {
+	//std::string inStr = std::to_string(amount);
+	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Blue, inStr.c_str());
+	//FRotator rot = FRotator(amount, 0, 0);
+	//this->AddActorWorldRotation(rot);
+
+	FRotator rot = this->GetActorRotation() + FRotator(amount, 0, 0);
+
+
+	this->SetActorRotation(rot);
 }
