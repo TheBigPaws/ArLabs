@@ -65,7 +65,11 @@ void ACustomARPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//Bind various player inputs to functions
 	// There are a few types - BindTouch, BindAxis, and BindEvent.  
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &ACustomARPawn::OnScreenTouch);
+	//PlayerInputComponent->BindAxis(APawn::GetMovementComponent);
+	//this->GetMovementComponent()
 	PlayerInputComponent->BindTouch(IE_Repeat, this, &ACustomARPawn::OnScreenHeld);
+	PlayerInputComponent->BindAxis("MoveRight", this, &ACustomARPawn::moveRight);
+	PlayerInputComponent->BindAxis("MoveForward", this, &ACustomARPawn::moveForward);
 
 }
 
@@ -147,16 +151,6 @@ void ACustomARPawn::OnScreenTouch(const ETouchIndex::Type FingerIndex, const FVe
 		
 	}
 
-	// Get object of actor hit.
-	//UClass* hitActorClass = UGameplayStatics::GetObjectClass(HRRef.GetActor());
-	// if we've hit a target.
-
-	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString(HRRef.GetActor()->GetClass()));
-	//UKismetSystemLibrary::PrintString(this, HRRef.GetActor()->GetClass().tostr, true, true, FLinearColor(0, 0.66, 1, 1), 2);
-
-
-	//APlaceableActor* placActorRef = Cast<APlaceableActor>(HRRef.GetActor());
-
 	
 	if (GM)
 	{
@@ -232,5 +226,19 @@ void ACustomARPawn::handleImageRecognition() {
 				WorldCube->SetActorLocation(MyLoc);
 			}
 		}
+	}
+}
+
+void ACustomARPawn::moveRight(float amount) {
+	if (amount) {
+		FVector fwd = GetActorRightVector();
+		this->AddActorWorldOffset(fwd * desktopMSspeed);
+	}
+}
+void ACustomARPawn::moveForward(float amount) {
+	if (amount){
+		FVector fwd = GetActorForwardVector();
+		this->AddActorWorldOffset(fwd * desktopMSspeed);
+
 	}
 }

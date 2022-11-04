@@ -29,6 +29,8 @@ protected:
 
 	UARSessionConfig* Config;
 
+	float desktopMSspeed = 100.0f;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -54,5 +56,8 @@ public:
 	bool bWorldFound = false;
 	AActor* GoghCube;
 	AActor* WorldCube;
+
+	void moveRight(float amount);
+	void moveForward(float amount);
 
 };
