@@ -10,6 +10,15 @@
 #include "CustomARPawn.generated.h"
 
 class UCameraComponent;
+//UENUM()
+//enum ClickState{MOVE,SELECT,PLACE};
+UENUM()
+enum ClickState
+{
+	MOVE    UMETA(DisplayName = "MOVE"),
+	SELECT  UMETA(DisplayName = "SELECT"),
+	PLACE   UMETA(DisplayName = "PLACE"),
+};
 
 UCLASS()
 class UE5_AR_API ACustomARPawn : public APawn
@@ -19,7 +28,8 @@ class UE5_AR_API ACustomARPawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	ACustomARPawn();
-
+	UPROPERTY(Category = "myCategory", VisibleAnywhere, BlueprintReadWrite)
+	TEnumAsByte<ClickState> myClickState;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -45,6 +55,12 @@ public:
 
 	UPROPERTY(Category = "myCategory", VisibleAnywhere, BlueprintReadWrite)
 		UCameraComponent* CameraComponent;
+
+	UFUNCTION(BlueprintCallable)
+		void setClickMode(TEnumAsByte<ClickState> StateSetter) {
+		myClickState = StateSetter;
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Switched State!");
+	}
 
 	bool WorldHitTest(FVector2D screenTouchPos, FHitResult & hitResult);
 

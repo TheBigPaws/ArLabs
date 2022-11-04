@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{3DBC278D-4639-2845-0973-BD933EECEEE7}",
+	"EngineAssociation": "{C943BF06-4A1A-BA41-0BCB-99A49934946E}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -29,6 +29,14 @@
 				"Win64",
 				"Mac"
 			]
+		},
+		{
+			"Name": "ModelingToolsEditorMode",
+			"Enabled": true
+		},
+		{
+			"Name": "StaticMeshEditorModeling",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [

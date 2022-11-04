@@ -4,17 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "CustomActor.generated.h"
+#include "OpeningDoor.generated.h"
 
 UCLASS()
-class UE5_AR_API ACustomActor : public AActor
+class UE5_AR_API AOpeningDoor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ACustomActor();
-	float t;
+	AOpeningDoor();
 
 protected:
 	// Called when the game starts or when spawned
@@ -24,15 +23,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	float openProgress;
 	UPROPERTY(Category = "myCategory", VisibleAnywhere, BlueprintReadWrite)
 		USceneComponent* SceneComponent;
 
 	UPROPERTY(Category = "myCategory", VisibleAnywhere, BlueprintReadWrite)
-		UStaticMeshComponent* LeftDoor;
-
-	UPROPERTY(Category = "myCategory", VisibleAnywhere, BlueprintReadWrite)
-		UStaticMeshComponent* RightDoor;
-
-	FVector StartLocation;
+		UStaticMeshComponent* StaticMeshComponent;
 
 };

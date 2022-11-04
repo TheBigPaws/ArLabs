@@ -25,9 +25,7 @@ ACustomARPawn::ACustomARPawn()
 	
 	CameraComponent->SetupAttachment(SceneComponent);
 
-
-	static ConstructorHelpers::FObjectFinder<UARSessionConfig> ConfigAsset(TEXT("ARSessionConfig'/Game/Blueprints/HelloARSessionConfig.HelloARSessionConfig'"));
-	Config = ConfigAsset.Object;
+	//myState = MOVE;
 
 }
 
@@ -35,8 +33,7 @@ ACustomARPawn::ACustomARPawn()
 void ACustomARPawn::BeginPlay()
 {
 	Super::BeginPlay();
-
-	UARBlueprintLibrary::StartARSession(Config);
+	
 
 }
 
@@ -46,14 +43,9 @@ void ACustomARPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	handleImageRecognition();
+	//handleImageRecognition();
 
-	//SHOW CAM POS
-	//FString CameraPos = "Camera POS: ";
-	//APlayerCameraManager* manRef = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
-	//CameraPos += manRef->GetActorTransform().GetLocation().ToString();
-	//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Green, CameraPos);
-
+	
 }
 
 // Called to bind functionality to input
@@ -166,6 +158,9 @@ void ACustomARPawn::OnScreenTouch(const ETouchIndex::Type FingerIndex, const FVe
 bool ACustomARPawn::WorldHitTest(FVector2D screenTouchPos, FHitResult & hitResult) {
 	// Get player controller
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
+
+	//if(!playerController){
+
 	// Perform deprojection taking 2d clicked area and generating reference in 3d world-space.
 	FVector worldPosition;
 	FVector worldDirection; // Unit Vector
@@ -173,19 +168,17 @@ bool ACustomARPawn::WorldHitTest(FVector2D screenTouchPos, FHitResult & hitResul
 	bool deprojectionSuccess = UGameplayStatics::DeprojectScreenToWorld(playerController, screenTouchPos, /*out*/
 		worldPosition, /*out*/ worldDirection);
 	
-	// construct trace vector (from point clicked to 1000.0 units beyond in same direction)
-	FVector traceEndVector = worldDirection * 1000.0;
-	traceEndVector = worldPosition + traceEndVector;
-	// perform line trace (Raycast)
-	bool traceSuccess = GetWorld()->LineTraceSingleByChannel(hitResult, worldPosition, traceEndVector, ECollisionChannel::ECC_WorldDynamic);
-
-	if (traceSuccess) {
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("HIT SUCCESS"));
-	}else{
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("NO HIT"));
+	if (deprojectionSuccess) {
+		// construct trace vector (from point clicked to 1000.0 units beyond in same direction)
+		FVector traceEndVector = worldDirection * 1000.0;
+		traceEndVector = worldPosition + traceEndVector;
+		// perform line trace (Raycast)
+		bool traceSuccess = GetWorld()->LineTraceSingleByChannel(hitResult, worldPosition, traceEndVector, ECollisionChannel::ECC_WorldDynamic);
+		// return if the operation was successful
+		return traceSuccess;
 	}
-	// return if the operation was successful
-	return traceSuccess;
+	return false;
+	
 }
 
 void ACustomARPawn::handleImageRecognition() {

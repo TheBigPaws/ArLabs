@@ -7,6 +7,7 @@
 #include "ARSessionConfig.h"
 #include "ARBlueprintLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include <string>
 
 // Sets default values
 AHelloARManager::AHelloARManager()
@@ -45,7 +46,8 @@ void AHelloARManager::BeginPlay()
 
 	//Start the AR Session
 	UARBlueprintLibrary::StartARSession(Config);
-
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, std::to_string(Config->ShouldDoVerticalPlaneDetection()).c_str());
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, std::to_string(Config->ShouldDoHorizontalPlaneDetection()).c_str());
 	
 }
 

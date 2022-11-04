@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CustomActor.h"
+#include "OpeningDoor.h"
 
 // Sets default values
-ACustomActor::ACustomActor()
+AOpeningDoor::AOpeningDoor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -18,32 +18,21 @@ ACustomActor::ACustomActor()
 
 	auto MeshAsset = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
 	StaticMeshComponent->SetStaticMesh(MeshAsset.Object);
-	//StaticMeshComponent.setrelat
 	
-	t = 0;
+	openProgress = 0.0f;
 }
 
 // Called when the game starts or when spawned
-void ACustomActor::BeginPlay()
+void AOpeningDoor::BeginPlay()
 {
 	Super::BeginPlay();
-	StartLocation = GetActorLocation();
+	
 }
 
 // Called every frame
-void ACustomActor::Tick(float DeltaTime)
+void AOpeningDoor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	t += DeltaTime;
-	float scale, x, y;
-	scale = 2.0f / (3.0f - cos(2.0f * t));
-	scale *= 10;
-	x = scale * cos(t);
-	y = scale * sin(2.0f * t) / 2.0f;
-
-	SetActorLocation(FVector(StartLocation.X , StartLocation.Y + x, StartLocation.Z +y));
-
 
 }
 
