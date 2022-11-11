@@ -4,16 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "OpeningDoor.generated.h"
+#include "OpeningDoor.h"
+
+#include "StencilBox.generated.h"
 
 UCLASS()
-class UE5_AR_API AOpeningDoor : public AActor
+class UE5_AR_API AStencilBox : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AOpeningDoor();
+	AStencilBox();
 
 protected:
 	// Called when the game starts or when spawned
@@ -22,17 +24,15 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	AOpeningDoor* doorOne;
+	AOpeningDoor* doorTwo;
 
-	AOpeningDoor* otherDoor;
+	UMaterialInstanceDynamic* onMat;
 
-	float openProgress;
-
-	bool opening;
+	UPROPERTY(Category = "myCategory", VisibleAnywhere, BlueprintReadWrite)
+	TArray<UStaticMeshComponent * >BoxWalls;
 
 	UPROPERTY(Category = "myCategory", VisibleAnywhere, BlueprintReadWrite)
 		USceneComponent* SceneComponent;
-
-	UPROPERTY(Category = "myCategory", VisibleAnywhere, BlueprintReadWrite)
-		UStaticMeshComponent* StaticMeshComponent;
 
 };

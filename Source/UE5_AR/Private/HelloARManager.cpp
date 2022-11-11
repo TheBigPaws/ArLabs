@@ -22,6 +22,10 @@ AHelloARManager::AHelloARManager()
 	// This way, unreal will notify your artist if the asset is being used and what can be used to replace it.
 	static ConstructorHelpers::FObjectFinder<UARSessionConfig> ConfigAsset(TEXT("ARSessionConfig'/Game/Blueprints/HelloARSessionConfig.HelloARSessionConfig'"));
 	Config = ConfigAsset.Object;
+
+	Config->bUseSceneDepthForOcclusion = true;
+	Config->SetSessionTrackingFeatureToEnable(EARSessionTrackingFeature::SceneDepth);
+
 	//UARBlueprintLibrary::StartARSession(Config);
 
 
@@ -46,8 +50,7 @@ void AHelloARManager::BeginPlay()
 
 	//Start the AR Session
 	UARBlueprintLibrary::StartARSession(Config);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, std::to_string(Config->ShouldDoVerticalPlaneDetection()).c_str());
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, std::to_string(Config->ShouldDoHorizontalPlaneDetection()).c_str());
+
 	
 }
 
@@ -55,6 +58,10 @@ void AHelloARManager::BeginPlay()
 void AHelloARManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	std::string planeActorsPresentPrint = "Number of detected planes: ";
+	planeActorsPresentPrint += std::to_string(PlaneActors.Num());
+	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Yellow, planeActorsPresentPrint.c_str());
 
 
 	switch (UARBlueprintLibrary::GetARSessionStatus().Status)

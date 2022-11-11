@@ -92,11 +92,17 @@ void ACustomARPawn::OnScreenTouch(const ETouchIndex::Type FingerIndex, const FVe
 	for (TObjectIterator<APlaceableActor> It; It; ++It)
 	{
 		APlaceableActor* CurrentObject = *It;
-		CurrentObject->selected = false;
-		CurrentObject->nearby = true;
-		CurrentObject->StaticMeshComponent->SetMaterial(0, CurrentObject->onMat);
-		CurrentObject->SetActorScale3D(FVector(1.0f, 1.0f, 1.0f));
-		selectedActor_ = NULL;
+		
+		if (CurrentObject->selected) {
+			CurrentObject->selected = false;
+			CurrentObject->nearby = true;
+			CurrentObject->StaticMeshComponent->SetMaterial(0, CurrentObject->onMat);
+			CurrentObject->SetActorScale3D(FVector(1.0f, 1.0f, 1.0f));
+			selectedActor_ = NULL;
+			break;
+		}
+			
+		
 	}
 
 	
@@ -136,6 +142,7 @@ void ACustomARPawn::OnScreenTouch(const ETouchIndex::Type FingerIndex, const FVe
 			else {
 				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("CAST TO PlaceableActor FAILED"));
 				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, HRRef.GetActor()->GetFName().ToString());
+
 				for (TObjectIterator<AARPlaneActor> It; It; ++It)
 				{
 					AARPlaneActor* CurrentObject = *It;
@@ -159,7 +166,11 @@ bool ACustomARPawn::WorldHitTest(FVector2D screenTouchPos, FHitResult & hitResul
 	// Get player controller
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
 
-	//if(!playerController){
+	if (!playerController) {
+		return false;
+	}
+
+
 
 	// Perform deprojection taking 2d clicked area and generating reference in 3d world-space.
 	FVector worldPosition;

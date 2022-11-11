@@ -28,10 +28,7 @@ public:
 		USceneComponent* SceneComponent;
 
 	UPROPERTY(Category = "myCategory", VisibleAnywhere, BlueprintReadWrite)
-		UStaticMeshComponent* LeftDoor;
-
-	UPROPERTY(Category = "myCategory", VisibleAnywhere, BlueprintReadWrite)
-		UStaticMeshComponent* RightDoor;
+		UStaticMeshComponent* StaticMeshComponent;
 
 	FVector StartLocation;
 

@@ -19,6 +19,9 @@ AOpeningDoor::AOpeningDoor()
 	auto MeshAsset = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
 	StaticMeshComponent->SetStaticMesh(MeshAsset.Object);
 	
+	StaticMeshComponent->SetWorldScale3D(FVector(1.0f,0.5f,0.05f));
+
+	opening = true;
 	openProgress = 0.0f;
 }
 
@@ -34,5 +37,20 @@ void AOpeningDoor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+	if (opening) {
+		openProgress += DeltaTime;
+		if (openProgress >= 1) {
+			opening = false;
+			openProgress = 1.0f;
+		}
+
+		if (openProgress < 0.5f) {
+			this->AddActorLocalOffset(FVector(0.0f,0.0f, 10*DeltaTime));
+		}
+		else {
+			this->AddActorLocalOffset(FVector(0.0f, 100*DeltaTime, 0.0f));
+		}
+	}
 }
 
