@@ -2,6 +2,7 @@
 
 
 #include "StencilBox.h"
+#include <string>
 
 // Sets default values
 AStencilBox::AStencilBox()
@@ -21,11 +22,16 @@ AStencilBox::AStencilBox()
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	SetRootComponent(SceneComponent);
 
+	auto planeAsset = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Plane.Plane'"));
+
 	for (int i = 0; i < 5; i++) {
-		BoxWalls.Add(CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent")));
+
+		std::string name_ = "StaticMeshComponent";
+		name_ += std::to_string(i);
+		BoxWalls.Add(CreateDefaultSubobject<UStaticMeshComponent>(FName(name_.c_str())));
 		BoxWalls.Last()->SetupAttachment(SceneComponent);
 
-		auto planeAsset = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Plane.Plane'"));
+		
 		BoxWalls.Last()->SetStaticMesh(planeAsset.Object);
 		BoxWalls.Last()->SetMaterial(0, onMat);
 
