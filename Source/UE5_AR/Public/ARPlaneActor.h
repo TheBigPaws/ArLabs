@@ -57,6 +57,8 @@ protected:
 
 public:
 
+	int myVerticesNum = 0;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

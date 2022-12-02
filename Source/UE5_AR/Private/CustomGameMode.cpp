@@ -159,3 +159,40 @@ void ACustomGameMode::LineTraceSpawnActor(FVector ScreenPos)
 	}
 }
 
+bool ACustomGameMode::LineTraceCheckForClass(FVector ScreenPos)
+{
+
+
+	return false;
+}
+
+//returns whether we hit something
+bool ACustomGameMode::WorldHitTest(FVector2D screenTouchPos, FHitResult& hitResult) {
+	// Get player controller
+	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
+
+	if (!playerController) {
+		return false;
+	}
+
+
+
+	// Perform deprojection taking 2d clicked area and generating reference in 3d world-space.
+	FVector worldPosition;
+	FVector worldDirection; // Unit Vector
+
+	bool deprojectionSuccess = UGameplayStatics::DeprojectScreenToWorld(playerController, screenTouchPos, /*out*/
+		worldPosition, /*out*/ worldDirection);
+
+	if (deprojectionSuccess) {
+		// construct trace vector (from point clicked to 1000.0 units beyond in same direction)
+		FVector traceEndVector = worldDirection * 100000.0;
+		traceEndVector = worldPosition + traceEndVector;
+		// perform line trace (Raycast)
+		bool traceSuccess = GetWorld()->LineTraceSingleByChannel(hitResult, worldPosition, traceEndVector, ECollisionChannel::ECC_WorldDynamic);
+		// return if the operation was successful
+		return traceSuccess;
+	}
+	return false;
+
+}

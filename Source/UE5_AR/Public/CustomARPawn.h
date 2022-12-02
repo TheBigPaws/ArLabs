@@ -62,7 +62,7 @@ public:
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, "Switched State!");
 	}
 
-	bool WorldHitTest(FVector2D screenTouchPos, FHitResult & hitResult);
+	
 
 	void handleImageRecognition();
 
@@ -78,4 +78,5 @@ public:
 	void moveForward(float amount);
 	void LookRight(float amount);
 	void LookUp(float amount);
+	void selectVisibilityOfAllPlanes(bool visibility);
 };

@@ -7,6 +7,7 @@
 #include "ARSessionConfig.h"
 #include "ARBlueprintLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 #include <string>
 
 // Sets default values
@@ -62,7 +63,21 @@ void AHelloARManager::Tick(float DeltaTime)
 	std::string planeActorsPresentPrint = "Number of detected planes: ";
 	planeActorsPresentPrint += std::to_string(PlaneActors.Num());
 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Yellow, planeActorsPresentPrint.c_str());
+	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Orange,std::to_string(FColor::Red.A).c_str());
+	//for (int i = 0; i < PlaneActors.Num(); i++)
+	//{
+	//	DrawDebugString(GetWorld(), PlaneActors[i]->GetActorLocation() += FVector(0.0f, 0.0f, 50.0f), std::to_string(PlaneActors[0]->myVerticesNum).c_str(), this, FColor(255 - PlaneActors[0]->PlaneColor.R,255 - PlaneActors[0]->PlaneColor.G,255 - PlaneActors[0]->PlaneColor.B), 0.0f, false, 2.0f);
+	//}
 
+
+	//TMap<int32, AActor*> exampleIntegerToActorMap;
+	for (const TPair<UARPlaneGeometry*, AARPlaneActor*>& pair : PlaneActors)
+	{
+		//pair.Key;
+		//pair.Value;
+		DrawDebugString(GetWorld(), pair.Value->GetActorLocation() += FVector(0.0f, 0.0f, 50.0f), std::to_string(pair.Value->myVerticesNum).c_str(), this, FColor(255 - pair.Value->PlaneColor.R,255 - pair.Value->PlaneColor.G,255 - pair.Value->PlaneColor.B), 0.0f, false, 2.0f);
+
+	}
 
 	switch (UARBlueprintLibrary::GetARSessionStatus().Status)
 	{

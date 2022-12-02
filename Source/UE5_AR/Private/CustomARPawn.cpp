@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "CustomGameMode.h"
 #include "goghCube.h"
+#include "CubeCrumbling.h"
 #include "WorldSphere.h"
 #include "ARPlaneActor.h"
 #include <string>
@@ -108,51 +109,37 @@ void ACustomARPawn::OnScreenTouch(const ETouchIndex::Type FingerIndex, const FVe
 	
 	// Perform a hitTest, get the return values as hitTesTResult
 	FHitResult HRRef;
-	if (!WorldHitTest(FVector2D(ScreenPos), HRRef))
+	if (!GM->WorldHitTest(FVector2D(ScreenPos), HRRef))
 	{
 		// HitTest returned false, get out.
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Orange, TEXT("Nothing pressed"));
 		//return;
 
-		for (TObjectIterator<AARPlaneActor> It; It; ++It)
-		{
-			AARPlaneActor* CurrentObject = *It;
-			CurrentObject->shouldBeVisible = true;
-		}
+		selectVisibilityOfAllPlanes(true);
 	}
 	else {
-		//UClass* hitActorClass = UGameplayStatics::GetObjectClass(HRRef.GetActor());
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, hitActorClass->GetFName().ToString());
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, HRRef.GetActor()->GetClass()->GetFName().ToString());
-		//return;
-			APlaceableActor* placActorRef = Cast<APlaceableActor>(HRRef.GetActor());
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Orange, HRRef.GetActor()->GetFName().ToString());
+
+			//CASTS and different interaction
+			APlaceableActor* placActorRef = Cast<APlaceableActor>(HRRef.GetActor()); // IF I CLICKED ON PLACEABLE ACTOR
 			if (placActorRef) {
 				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("Android clicked"));
 				placActorRef->selected = true;
 				placActorRef->StaticMeshComponent->SetMaterial(0, placActorRef->selectedMat);
 				selectedActor_ = placActorRef;
 
-				for (TObjectIterator<AARPlaneActor> It; It; ++It)
-				{
-					AARPlaneActor* CurrentObject = *It;
-					CurrentObject->shouldBeVisible = false;
-				}
+				selectVisibilityOfAllPlanes(false);
 				return;
 			}
-			else {
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("CAST TO PlaceableActor FAILED"));
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, HRRef.GetActor()->GetFName().ToString());
-
-				for (TObjectIterator<AARPlaneActor> It; It; ++It)
-				{
-					AARPlaneActor* CurrentObject = *It;
-					CurrentObject->shouldBeVisible = true;
-				}
+			ACubeCrumbling* crumblCubeRef = Cast<ACubeCrumbling>(HRRef.GetActor()); // IF I CLICKED ON PLACEABLE ACTOR
+			if (crumblCubeRef) {
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("crumblingCubePressed"));
+				crumblCubeRef->partlyCrumble();
 				return;
 			}
 		
 	}
-
+	 
 	
 	if (GM)
 	{
@@ -162,35 +149,6 @@ void ACustomARPawn::OnScreenTouch(const ETouchIndex::Type FingerIndex, const FVe
 	
 }
 
-bool ACustomARPawn::WorldHitTest(FVector2D screenTouchPos, FHitResult & hitResult) {
-	// Get player controller
-	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
-
-	if (!playerController) {
-		return false;
-	}
-
-
-
-	// Perform deprojection taking 2d clicked area and generating reference in 3d world-space.
-	FVector worldPosition;
-	FVector worldDirection; // Unit Vector
-	
-	bool deprojectionSuccess = UGameplayStatics::DeprojectScreenToWorld(playerController, screenTouchPos, /*out*/
-		worldPosition, /*out*/ worldDirection);
-	
-	if (deprojectionSuccess) {
-		// construct trace vector (from point clicked to 1000.0 units beyond in same direction)
-		FVector traceEndVector = worldDirection * 1000.0;
-		traceEndVector = worldPosition + traceEndVector;
-		// perform line trace (Raycast)
-		bool traceSuccess = GetWorld()->LineTraceSingleByChannel(hitResult, worldPosition, traceEndVector, ECollisionChannel::ECC_WorldDynamic);
-		// return if the operation was successful
-		return traceSuccess;
-	}
-	return false;
-	
-}
 
 void ACustomARPawn::handleImageRecognition() {
 	auto storage = UARBlueprintLibrary::GetAllGeometriesByClass<UARTrackedImage>();
@@ -282,4 +240,14 @@ void ACustomARPawn::LookUp(float amount) {
 
 
 	this->SetActorRotation(rot);
+}
+
+void ACustomARPawn::selectVisibilityOfAllPlanes(bool visibility)
+{
+
+	for (TObjectIterator<AARPlaneActor> It; It; ++It)
+	{
+		AARPlaneActor* CurrentObject = *It;
+		CurrentObject->shouldBeVisible = visibility;
+	}
 }

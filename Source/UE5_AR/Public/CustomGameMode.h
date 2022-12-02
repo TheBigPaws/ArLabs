@@ -25,7 +25,7 @@ public:
 	ACustomGameMode();
 	virtual ~ACustomGameMode() = default;
 
-
+	bool WorldHitTest(FVector2D screenTouchPos, FHitResult& hitResult);
 	virtual void StartPlay() override;
 
 
@@ -56,7 +56,7 @@ public:
 	 * @param ScreenPos Pass the Screen Position as an FVector
 	 */
 	virtual void LineTraceSpawnActor(FVector ScreenPos);
-	
+	virtual bool LineTraceCheckForClass(FVector ScreenPos);
 
 	/**
 	 * @brief This function is virtual - you can inherit this class to override this function

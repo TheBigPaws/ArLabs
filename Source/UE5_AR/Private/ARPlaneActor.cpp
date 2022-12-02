@@ -123,6 +123,8 @@ void AARPlaneActor::UpdatePlanePolygonMesh()
 
 	}
 
+	myVerticesNum = PolygonMeshVertices.Num();
+
 	// Generate triangle indices
 
 	// Perimeter triangles
